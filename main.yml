@@ -45,6 +45,17 @@ Resources:
       Parameters:
         VPCId: !Ref VPCId
 
+  EFSFileSystemStack:
+    Type: 'AWS::CloudFormation::Stack'
+    DependsOn: SecurityGroupsStack
+    Properties:
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/efs-filesystem.yml'
+      Parameters:
+        PrivateStgSubnet1a: !Ref PrivateStgSubnet1a
+        PrivateStgSubnet1b: !Ref PrivateStgSubnet1b
+        PrivateStgSubnet1c: !Ref PrivateStgSubnet1c
+        sgDeadlineEFSRepository: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineEFSRepository
+
 Outputs:
   VPCId:
     Description: The VPC ID
