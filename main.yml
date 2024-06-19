@@ -50,12 +50,3 @@ Outputs:
     Description: The VPC ID selected from the dropdown
     Value: !Ref VPCId
 
-# Deploy the following items
-
-# - Security Groups
-# - EFS Respository Storage
-# - DocumentDB Database
-# - RCS Servers Launch Template
-# - Application Loadbalancer
-# - Scaling Group (2 Instances)
-
