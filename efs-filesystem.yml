@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template to create an EFS filesystem for DeadlineRepository
+
+Parameters:
+  PrivateStgSubnet1a:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1a
+  PrivateStgSubnet1b:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1b
+  PrivateStgSubnet1c:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1c
+  sgDeadlineEFSRepository:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security Group for the EFS Repository
+
+Resources:
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      FileSystemTags:
+        - Key: Name
+          Value: DeadlineRepository
+      LifecyclePolicies:
+        - TransitionToIA: AFTER_30_DAYS
+      Encrypted: true
+      FileSystemPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 'elasticfilesystem:ClientRootAccess'
+              - 'elasticfilesystem:ClientMount'
+              - 'elasticfilesystem:ClientWrite'
+            Condition:
+              Bool:
+                'elasticfilesystem:AccessedViaMountTarget': 'true'
+          - Effect: Deny
+            Principal: '*'
+            Action: '*'
+            Condition:
+              Bool:
+                'aws:SecureTransport': 'false'
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      BackupPolicy:
+        Status: ENABLED
+
+  EFSMountTarget1a:
+    Type: AWS::EFS::MountTarget
+    DependsOn: EFSFileSystem
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateStgSubnet1a
+      SecurityGroups:
+        - !Ref sgDeadlineEFSRepository
+
+  EFSMountTarget1b:
+    Type: AWS::EFS::MountTarget
+    DependsOn: EFSFileSystem
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateStgSubnet1b
+      SecurityGroups:
+        - !Ref sgDeadlineEFSRepository
+
+  EFSMountTarget1c:
+    Type: AWS::EFS::MountTarget
+    DependsOn: EFSFileSystem
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateStgSubnet1c
+      SecurityGroups:
+        - !Ref sgDeadlineEFSRepository
+
+Outputs:
+  FileSystemId:
+    Description: The ID of the EFS filesystem
+    Value: !Ref EFSFileSystem
+
+  EFSMountTarget1a:
+    Description: The ID of the mount target in subnet 1a
+    Value: !Ref EFSMountTarget1a
+
+  EFSMountTarget1b:
+    Description: The ID of the mount target in subnet 1b
+    Value: !Ref EFSMountTarget1b
+  
+  EFSMountTarget1c:
+    Description: The ID of the mount target in subnet 1c
+    Value: !Ref EFSMountTarget1c
