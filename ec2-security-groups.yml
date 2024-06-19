@@ -88,7 +88,6 @@ Resources:
         - Key: Name
           Value: sgDeadlineWorkers
 
-
 Outputs:
   sgDeadlineRCS:
     Description: Security Group ID for Deadline RCS Servers
