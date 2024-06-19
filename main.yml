@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template Deployment of a Thinkbox Deadline
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+        - Label:
+            default: VPC Information
+          Parameters:
+          - VPCId
+
+        - Label:
+            default: Storage Network Subnets
+          Parameters:
+          - PrivateStgSubnet1a
+          - PrivateStgSubnet1b
+          - PrivateStgSubnet1c
+
+Parameters:
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: Select VPC
+    ConstraintDescription: Must be an existing VPC in the selected region.
+
+  PrivateStgSubnet1a:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select Subnet for the Deadline Repository EFS Storage
+    ConstraintDescription: Must be an existing subnet in the selected VPC.
+
+  PrivateStgSubnet1b:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select Subnet for the Deadline Repository EFS Storage
+    ConstraintDescription: Must be an existing subnet in the selected VPC.
+
+  PrivateStgSubnet1c:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select Subnet for the Deadline Repository EFS Storage
+    ConstraintDescription: Must be an existing subnet in the selected VPC.
+
+Resources:
+  SecurityGroupsStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/ec2-security-groups.yml'
+      Parameters:
+        VPCId: !Ref VPCId
+
+Outputs:
+  SelectedVPC:
+    Description: The VPC ID selected from the dropdown
+    Value: !Ref VPCId
+
+# Deploy the following items
+
+# - Security Groups
+# - EFS Respository Storage
+# - DocumentDB Database
+# - RCS Servers Launch Template
+# - Application Loadbalancer
+# - Scaling Group (2 Instances)
+
