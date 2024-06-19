@@ -46,7 +46,39 @@ Resources:
         VPCId: !Ref VPCId
 
 Outputs:
-  SelectedVPC:
-    Description: The VPC ID selected from the dropdown
+  VPCId:
+    Description: The VPC ID
     Value: !Ref VPCId
+    Export:
+      Name: !Sub "VPCId"
 
+# Security Group Stack Outputs
+  sgDeadlineRCS:
+    Description: "Security Group ID for Deadline RCS Servers"
+    Value: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineRCS
+    Export:
+      Name: !Sub "sgDeadlineRCS"
+
+  sgDeadlineEFSRepository:
+    Description: "Security Group ID for Deadline EFS Repository"
+    Value: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineEFSRepository
+    Export:
+      Name: !Sub "sgDeadlineEFSRepository"
+
+  sgDeadlineDocumentDBCluster:
+    Description: "Security Group ID for Deadline DocumentDB Cluster"
+    Value: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineDocumentDBCluster
+    Export:
+      Name: !Sub "sgDeadlineDocumentDBCluster"
+
+  sgDeadlineLoadBalancers:
+    Description: "Security Group ID for Deadline Application Loadbalancers"
+    Value: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineLoadBalancers
+    Export:
+      Name: !Sub "sgDeadlineLoadBalancers"
+
+  sgDeadlineWorkers:
+    Description: "Security Group ID for Deadline Workers"
+    Value: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineWorkers
+    Export:
+      Name: !Sub "sgDeadlineWorkers"
