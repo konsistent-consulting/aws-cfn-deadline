@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template of security groups for Thinkbox Deadline
+
+Parameters:
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: The ID of the VPC
+
+Resources:
+  sgDeadlineRCS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: sgDeadlineRCS
+      GroupDescription: Allows Access to Deadline RCS Servers
+      VpcId: 
+        Ref: VPCId
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: sgDeadlineRCS
+
+  sgDeadlineEFSRepository:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: sgDeadlineEFSRepository
+      GroupDescription: Allows Access to Deadline EFS Repository
+      VpcId: 
+        Ref: VPCId
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: 
+            Ref: sgDeadlineRCS
+      Tags:
+        - Key: Name
+          Value: sgDeadlineEFSRepository
+
+  sgDeadlineDocumentDBCluster:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: sgDeadlineDocumentDBCluster
+      GroupDescription: Allows Access to Deadline DocumentDB Cluster
+      VpcId: 
+        Ref: VPCId
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: sgDeadlineDocumentDBCluster
+
+  sgDeadlineLoadBalancers:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: sgDeadlineLoadBalancers
+      GroupDescription: Allows Access to Deadline Application Load Balancers
+      VpcId: 
+        Ref: VPCId
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: sgDeadlineLoadBalancers
+
+  sgDeadlineWorkers:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: sgDeadlineWorkers
+      GroupDescription: Allows Access to Deadline Workers
+      VpcId: 
+        Ref: VPCId
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: sgDeadlineWorkers
+
+
+Outputs:
+  sgDeadlineRCS:
+    Description: Security Group ID for Deadline RCS Servers
+    Value: !Ref sgDeadlineRCS
+
+  sgDeadlineEFSRepository:
+    Description: Security Group ID for Deadline EFS Repository
+    Value: !Ref sgDeadlineEFSRepository
+
+  sgDeadlineDocumentDBCluster:
+    Description: Security Group ID for Deadline DocumentDB Cluster
+    Value: !Ref sgDeadlineDocumentDBCluster
+
+  sgDeadlineLoadBalancers:
+    Description: Security Group ID for Deadline Application Loadbalancers
+    Value: !Ref sgDeadlineLoadBalancers
+
+  sgDeadlineWorkers:
+    Description: Security Group ID for Deadline Workers
+    Value: !Ref sgDeadlineWorkers
