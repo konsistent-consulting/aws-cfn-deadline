@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template Deployment of a Thinkbox Deadline DocumentDB
+
+Parameters:
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: The ID of the VPC
+
+  PrivateSvcsSubnet1a:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1a
+
+  PrivateSvcsSubnet1b:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1b
+
+  PrivateSvcsSubnet1c:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1c
+
+  sgDeadlineDocumentDBCluster:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security Group for the Deadline DocumentDB Cluster
+
+  DocumentDBUsername:
+    Description: "Enter the DocumentDB Username"
+    Type: String
+    NoEcho: false  # Set to true if you want to mask the input
+    AllowedPattern: "^[a-zA-Z0-9_-]+$"
+    ConstraintDescription: Specify an alphanumeric string that defines the login ID for the user, Username must start with a letter and contain 1 to 63 characters
+
+  DocumentDBPassword:
+    Description: "Enter the DocumentDB Username"
+    Type: String
+    NoEcho: true  # Set to true to mask the input
+    MinLength: 8
+    MaxLength: 32
+    AllowedPattern: "^[a-zA-Z0-9]+$"
+    ConstraintDescription: "Password must be at least eight characters long and cannot contain a / (slash), \" (double quote) or @ (at symbol)."
+
+Resources:
+  DocumentDBSubnetGroup:
+    Type: AWS::DocDB::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupName: database-subnets-cluster01
+      DBSubnetGroupDescription: Subnets for Deadline10 Database Cluster
+      SubnetIds: 
+        - Ref: PrivateSvcsSubnet1a
+        - Ref: PrivateSvcsSubnet1b
+        - Ref: PrivateSvcsSubnet1c
+
+  DocumentDBCluster:
+    Type: AWS::DocDB::DBCluster
+    Properties:
+      DBClusterIdentifier: deadline10-docdb-cluster-001
+      EngineVersion: 5.0.0
+      MasterUsername: !Ref DocumentDBUsername
+      MasterUserPassword: !Ref DocumentDBPassword
+      DBSubnetGroupName: !Ref DocumentDBSubnetGroup
+      VpcSecurityGroupIds:
+        - Ref: sgDeadlineDocumentDBCluster
+      Port: 27017
+      StorageEncrypted: true
+      BackupRetentionPeriod: 28
+      PreferredBackupWindow: 02:00-03:00
+      PreferredMaintenanceWindow: sun:04:00-sun:05:00
+
+  DocumentDBInstance:
+    Type: AWS::DocDB::DBInstance
+    Properties:
+      DBInstanceClass: db.t3.medium
+      DBClusterIdentifier: !Ref DocumentDBCluster
+      DBInstanceIdentifier: deadline10-docdb-cluster-instance-001
+
+Outputs:
+  SubnetGroupName:
+    Description: The name of the created subnet group.
+    Value: !Ref DocumentDBSubnetGroup
+
+  ClusterEndpoint:
+    Description: The endpoint of the created DocumentDB cluster.
+    Value: !GetAtt DocumentDBCluster.Endpoint
