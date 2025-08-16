@@ -75,6 +75,21 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole
 
+  IAMResourceTrackerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: DeadlineResourceTrackerAccessRole
+      Description: IAM role for Deadline Resource Tracker Lambda to manage AWS resources it creates.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSThinkboxDeadlineResourceTrackerAccessPolicy
+
   # SSM Parameters to store Information from the Template
   SpotEventPluginUserNameParameter:
     Type: AWS::SSM::Parameter
