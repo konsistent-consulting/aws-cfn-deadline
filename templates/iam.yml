@@ -40,6 +40,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: DeadlineSpotWorker
+      Description: "Role for Deadline Spot Fleet Workers"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -56,6 +57,23 @@ Resources:
       InstanceProfileName: DeadlineSpotWorker
       Roles:
         - !Ref DeadlineSpotWorkerRole
+
+# IAM Fleet Role
+
+  IAMFleetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-ec2-spot-fleet-tagging-role
+      Description: IAM role for EC2 Spot Fleet to request, launch, and tag Spot Instances.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: spotfleet.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole
 
   # SSM Parameters to store Information from the Template
   SpotEventPluginUserNameParameter:
