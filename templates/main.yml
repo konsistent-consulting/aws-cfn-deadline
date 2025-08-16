@@ -94,6 +94,11 @@ Resources:
       Parameters:
         VPCId: !Ref VPCId
 
+  IAMRolesStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/iam.yml'
+
   EFSFileSystemStack:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: SecurityGroupsStack
