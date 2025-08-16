@@ -35,6 +35,10 @@ Parameters:
     Description: Select VPC
     ConstraintDescription: Must be an existing VPC in the selected region.
 
+  TopStackName:
+    Type: String
+    Description: Base logical name for this Deadline environment (e.g. studio-ldn-deadline)
+
 # EFS Storage Parameters
 
   PrivateStgSubnet1a:
@@ -98,6 +102,8 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
       TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/iam.yml'
+      Parameters:
+        TopStackName: !Ref TopStackName
 
   EFSFileSystemStack:
     Type: 'AWS::CloudFormation::Stack'

@@ -3,7 +3,13 @@ Description: >
   Creates IAM user for Deadline Spot Event Plugin, attaches required policies,
   generates access keys, and stores them in Secrets Manager.
 
+Parameters:
+  TopStackName:
+    Type: String
+
 Resources:
+
+# Create IAM User for Deadline Spot Event Plugin Admin
   DeadlineSpotEventPluginAdminUser:
     Type: AWS::IAM::User
     Properties:
@@ -32,14 +38,14 @@ Resources:
   SpotEventPluginUserNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/managed-studio/${AWS::StackName}/deadline10/username"
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/username"
       Type: String
       Value: !Ref DeadlineSpotEventPluginAdminUser
 
   SpotEventPluginSecretArnParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/managed-studio/${AWS::StackName}/deadline10/secret-arn"
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/secret-arn"
       Type: String
       Value: !Ref DeadlineSpotEventPluginAdminUserSecret
 
