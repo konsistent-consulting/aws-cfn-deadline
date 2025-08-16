@@ -34,6 +34,29 @@ Resources:
           "SecretAccessKey": "${DeadlineSpotEventPluginAdminUserAccessKey.SecretAccessKey}"
         }
 
+# Deadline Spot Worker Role
+
+  DeadlineSpotWorkerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: DeadlineSpotWorker
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSThinkboxDeadlineSpotEventPluginWorkerPolicy
+
+  DeadlineSpotWorkerInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: DeadlineSpotWorker
+      Roles:
+        - !Ref DeadlineSpotWorkerRole
+
   # SSM Parameters to store Information from the Template
   SpotEventPluginUserNameParameter:
     Type: AWS::SSM::Parameter
@@ -48,6 +71,13 @@ Resources:
       Name: !Sub "/managed-studio/${TopStackName}/deadline10/secret-arn"
       Type: String
       Value: !Ref DeadlineSpotEventPluginAdminUserSecret
+
+  SpotWorkerRoleNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/spot-worker-role-name"
+      Type: String
+      Value: !Ref DeadlineSpotWorkerRole
 
 Outputs:
   IAMUserName:
