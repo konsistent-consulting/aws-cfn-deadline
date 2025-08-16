@@ -8,7 +8,6 @@ Parameters:
     Type: String
 
 Resources:
-
 # Create IAM User for Deadline Spot Event Plugin Admin
   DeadlineSpotEventPluginAdminUser:
     Type: AWS::IAM::User
