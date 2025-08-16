@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Creates IAM user for Deadline Spot Event Plugin, attaches required policies,
+  generates access keys, and stores them in Secrets Manager.
+
+Resources:
+  DeadlineSpotEventPluginAdminUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: DeadlineSpotEventPluginAdmin
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSThinkboxDeadlineSpotEventPluginAdminPolicy
+        - arn:aws:iam::aws:policy/AWSThinkboxDeadlineResourceTrackerAdminPolicy
+
+  DeadlineSpotEventPluginAdminUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref DeadlineSpotEventPluginAdminUser
+
+  DeadlineSpotEventPluginAdminUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Ref DeadlineSpotEventPluginAdminUser
+      Description: Access credentials for Deadline Spot Event Plugin Admin
+      SecretString: !Sub |
+        {
+          "AccessKeyId": "${DeadlineSpotEventPluginAdminUserAccessKey}",
+          "SecretAccessKey": "${DeadlineSpotEventPluginAdminUserAccessKey.SecretAccessKey}"
+        }
+
+  # SSM Parameters to store Information from the Template
+  SpotEventPluginUserNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${AWS::StackName}/deadline10/username"
+      Type: String
+      Value: !Ref DeadlineSpotEventPluginAdminUser
+
+  SpotEventPluginSecretArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${AWS::StackName}/deadline10/secret-arn"
+      Type: String
+      Value: !Ref DeadlineSpotEventPluginAdminUserSecret
+
+Outputs:
+  IAMUserName:
+    Description: Name of the IAM User created
+    Value: !Ref DeadlineSpotEventPluginAdminUser
+
+  SecretArn:
+    Description: ARN of the secret storing IAM credentials
+    Value: !Ref DeadlineSpotEventPluginAdminUserSecret
