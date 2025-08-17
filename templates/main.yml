@@ -17,7 +17,7 @@ Metadata:
           - PrivateStgSubnet1c
 
         - Label:
-            default: Database Subnets
+            default: DB, Load Balancer & RCS Server Subnets
           Parameters:
           - PrivateSvcsSubnet1a
           - PrivateSvcsSubnet1b
@@ -29,11 +29,21 @@ Metadata:
           - DocumentDBUsername
           - DocumentDBPassword
 
+        - Label:
+            default: Deadline RCS Servers Configuration
+          Parameters:
+          - KeyName
+          - DocumentDBPassword
+
 Parameters:
   VPCId:
     Type: AWS::EC2::VPC::Id
     Description: Select VPC
     ConstraintDescription: Must be an existing VPC in the selected region.
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access
 
   TopStackName:
     Type: String
@@ -89,6 +99,15 @@ Parameters:
     AllowedPattern: "^[a-zA-Z0-9]+$"
     ConstraintDescription: "Password must be at least eight characters long and cannot contain a / (slash), \" (double quote) or @ (at symbol)."
 
+# Deadline RCS Servers Parameters
+
+  RCSServerInstanceType:
+    Type: String
+    Default: t3a.medium
+    AllowedValues:
+      - t3a.medium
+      - t3a.large
+    Description: Instance type for Deadline RCS servers
 
 Resources:
   SecurityGroupsStack:
@@ -115,6 +134,7 @@ Resources:
         PrivateStgSubnet1b: !Ref PrivateStgSubnet1b
         PrivateStgSubnet1c: !Ref PrivateStgSubnet1c
         sgDeadlineEFSRepository: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineEFSRepository
+        TopStackName: !Ref TopStackName
 
   DocumentDBStack:
     Type: 'AWS::CloudFormation::Stack'
@@ -143,6 +163,19 @@ Resources:
         sgDeadlineLoadBalancers: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineLoadBalancers
         TopStackName: !Ref TopStackName
 
+  RCSServerLaunchTemplateStack:
+    Type: 'AWS::CloudFormation::Stack'
+    DependsOn: SecurityGroupsStack
+    Properties:
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/rcs-server-launch-template.yml'
+      Parameters:
+        VPCId: !Ref VPCId
+        PrivateSvcsSubnet1a: !Ref PrivateSvcsSubnet1a
+        PrivateSvcsSubnet1b: !Ref PrivateSvcsSubnet1b
+        PrivateSvcsSubnet1c: !Ref PrivateSvcsSubnet1c
+        sgDeadlineWorkers: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineWorkers
+        KeyName: !Ref KeyName
+        RCSServerInstanceType: !Ref RCSServerInstanceType
 
 Outputs:
   VPCId:

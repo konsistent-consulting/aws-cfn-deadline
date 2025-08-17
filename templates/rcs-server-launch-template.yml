@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Launch Template for Deadline RCS Server instances on Rocky Linux 9.
+
+Parameters:
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: The VPC where the RCS instances will run
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+
+  PrivateSvcsSubnet1a:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1a
+
+  PrivateSvcsSubnet1b:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1b
+
+  PrivateSvcsSubnet1c:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1c
+
+  sgDeadlineWorkers:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security Group for Deadline RCS servers
+
+  RCSServerInstanceType:
+    Type: String
+    Default: t3a.medium
+    AllowedValues:
+      - t3a.medium
+      - t3a.large
+    Description: Instance type for Deadline RCS servers
+
+Resources:
+  DeadlineRcsLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: deadline-rcs-servers
+      LaunchTemplateData:
+        ImageId: ami-05a5686f0de7aa5d5 # Rocky Linux 9 x86_64 HVM (hardcoded, update as needed per region)
+        InstanceType: !Ref RCSServerInstanceType
+        KeyName: !Ref KeyName
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              VolumeSize: 30
+              VolumeType: gp3
+              DeleteOnTermination: true
+              Encrypted: true
+        NetworkInterfaces:
+          - DeviceIndex: 0
+            AssociatePublicIpAddress: false
+            SubnetId: !Ref PrivateSvcsSubnet1a
+            Groups:
+              - !Ref sgDeadlineWorkers
+        MetadataOptions:
+          HttpTokens: required
+          HttpEndpoint: enabled           
+          HttpPutResponseHopLimit: 2      
+          InstanceMetadataTags: enabled 
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: Deadline-RCS
+          - ResourceType: volume
+            Tags:
+              - Key: Name
+                Value: Deadline-RCS
+          - ResourceType: network-interface
+            Tags:
+              - Key: Name
+                Value: Deadline-RCS
+        UserData: !Base64 |
+          #!/bin/bash
+          echo "=== Deadline RCS Node Userdata ==="
+          hostnamectl set-hostname deadline-rcs-node
+          echo "Hostname is: $(hostname)" > /var/log/deadline-rcs-userdata.log
+
+Outputs:
+  LaunchTemplateId:
+    Description: ID of the Launch Template
+    Value: !Ref DeadlineRcsLaunchTemplate
+
+  LaunchTemplateLatestVersion:
+    Description: Latest version number of the Launch Template
+    Value: !GetAtt DeadlineRcsLaunchTemplate.LatestVersionNumber
