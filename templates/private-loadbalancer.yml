@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Creates an internal Application Load Balancer for Deadline on port 4433.
+
+Parameters:
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: The ID of the VPC
+
+  PrivateSvcsSubnet1a:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1a
+
+  PrivateSvcsSubnet1b:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1b
+
+  PrivateSvcsSubnet1c:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID for Availability Zone 1c
+
+  sgDeadlineLoadBalancers:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security Group for the Deadline Application Loadbalancers
+
+  TopStackName:
+    Type: String
+
+  DeadlineCertArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: "/managed-studio/studio-ldn-deadline/deadline10/server-cert-arn"
+    Description: SSM path to the ACM Certificate ARN for Deadline
+
+Resources:
+  DeadlinePrivateLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: deadline-private-lb
+      Scheme: internal
+      Type: application
+      Subnets:
+        - !Ref PrivateSvcsSubnet1a
+        - !Ref PrivateSvcsSubnet1b
+        - !Ref PrivateSvcsSubnet1c
+      SecurityGroups:
+        - !Ref sgDeadlineLoadBalancers
+      IpAddressType: ipv4
+
+  DeadlinePrivateTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: deadline-rcs-tg-private
+      VpcId: !Ref VPCId
+      Protocol: HTTPS
+      Port: 4433
+      TargetType: instance
+      HealthCheckProtocol: HTTPS
+      HealthCheckPort: "4433"
+      HealthCheckPath: "/"
+      Matcher:
+        HttpCode: "200-399"
+
+  DeadlinePrivateListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref DeadlinePrivateLB
+      Port: 4433
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref DeadlineCertArn
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref DeadlinePrivateTargetGroup
+
+  # Store DNS name in SSM
+  DeadlinePrivateLBDNSParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/private-lb-dns"
+      Type: String
+      Value: !GetAtt DeadlinePrivateLB.DNSName
+
+Outputs:
+  DeadlinePrivateLBDNSName:
+    Description: DNS name of the internal Deadline ALB
+    Value: !GetAtt DeadlinePrivateLB.DNSName

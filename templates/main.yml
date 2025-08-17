@@ -130,6 +130,20 @@ Resources:
         DocumentDBUsername: !Ref DocumentDBUsername
         DocumentDBPassword: !Ref DocumentDBPassword
 
+  PrivateLoadBalancerStack:
+    Type: 'AWS::CloudFormation::Stack'
+    DependsOn: SecurityGroupsStack
+    Properties:
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/private-loadbalancer.yml'
+      Parameters:
+        VPCId: !Ref VPCId
+        PrivateSvcsSubnet1a: !Ref PrivateSvcsSubnet1a
+        PrivateSvcsSubnet1b: !Ref PrivateSvcsSubnet1b
+        PrivateSvcsSubnet1c: !Ref PrivateSvcsSubnet1c
+        sgDeadlineLoadBalancers: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineLoadBalancers
+        TopStackName: !Ref TopStackName
+
+
 Outputs:
   VPCId:
     Description: The VPC ID
