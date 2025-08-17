@@ -5,15 +5,22 @@ Parameters:
   PrivateStgSubnet1a:
     Type: AWS::EC2::Subnet::Id
     Description: Subnet ID for Availability Zone 1a
+
   PrivateStgSubnet1b:
     Type: AWS::EC2::Subnet::Id
     Description: Subnet ID for Availability Zone 1b
+  
   PrivateStgSubnet1c:
     Type: AWS::EC2::Subnet::Id
     Description: Subnet ID for Availability Zone 1c
+  
   sgDeadlineEFSRepository:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Security Group for the EFS Repository
+
+  TopStackName:
+    Type: String
+    Description: Base logical name for this Deadline environment (e.g. studio-ldn-deadline)
 
 Resources:
   EFSFileSystem:
@@ -75,10 +82,21 @@ Resources:
       SecurityGroups:
         - !Ref sgDeadlineEFSRepository
 
+  EFSMountDnsParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/efs-mount-dns"
+      Type: String
+      Value: !Sub "${EFSFileSystem}.efs.${AWS::Region}.amazonaws.com"
+
 Outputs:
   FileSystemId:
     Description: The ID of the EFS filesystem
     Value: !Ref EFSFileSystem
+
+  EFSMountDNS:
+    Description: DNS name of the EFS mount target
+    Value: !Sub "${EFSFileSystem}.efs.${AWS::Region}.amazonaws.com"
 
   EFSMountTarget1a:
     Description: The ID of the mount target in subnet 1a
