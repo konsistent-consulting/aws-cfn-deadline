@@ -214,3 +214,9 @@ Outputs:
     Value: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineWorkers
     Export:
       Name: !Sub "sgDeadlineWorkers"
+
+  EFSMountDNS:
+    Description: "DNS name of the EFS mount target"
+    Value: !GetAtt EFSFileSystemStack.Outputs.EFSMountDNS
+    Export:
+      Name: !Sub "EFSMountDNS"

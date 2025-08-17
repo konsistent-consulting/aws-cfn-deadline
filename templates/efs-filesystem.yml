@@ -18,6 +18,11 @@ Parameters:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Security Group for the EFS Repository
 
+  EFSMountDns:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: "/managed-studio/studio-ldn-deadline/deadline10/efs-mount-dns"
+    Description: SSM parameter holding the EFS mount DNS name
+
   TopStackName:
     Type: String
     Description: Base logical name for this Deadline environment (e.g. studio-ldn-deadline)
