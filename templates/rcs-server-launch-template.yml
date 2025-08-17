@@ -35,6 +35,10 @@ Parameters:
       - t3a.large
     Description: Instance type for Deadline RCS servers
 
+  DeadlineRCSServerProfileArn:
+    Type: String
+    Description: Instance profile name for Deadline RCS Servers
+
 Resources:
   DeadlineRcsLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -44,6 +48,8 @@ Resources:
         ImageId: ami-05a5686f0de7aa5d5 # Rocky Linux 9 x86_64 HVM (hardcoded, update as needed per region)
         InstanceType: !Ref RCSServerInstanceType
         KeyName: !Ref KeyName
+        IamInstanceProfile:
+          Arn: !Ref DeadlineRCSServerProfileArn
         BlockDeviceMappings:
           - DeviceName: /dev/sda1
             Ebs:

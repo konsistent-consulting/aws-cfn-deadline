@@ -49,6 +49,8 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSThinkboxDeadlineSpotEventPluginWorkerPolicy
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
 
   DeadlineSpotWorkerInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -56,6 +58,31 @@ Resources:
       InstanceProfileName: DeadlineSpotWorker
       Roles:
         - !Ref DeadlineSpotWorkerRole
+
+  DeadlineRCSServerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: DeadlineRCSServer
+      Description: "Role for Deadline RCS Servers"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSThinkboxDeadlineSpotEventPluginWorkerPolicy
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+  DeadlineRCSServerProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: DeadlineRCSServer
+      Roles:
+        - !Ref DeadlineRCSServerRole
+
 
 # IAM Fleet Role
 
@@ -119,3 +146,7 @@ Outputs:
   SecretArn:
     Description: ARN of the secret storing IAM credentials
     Value: !Ref DeadlineSpotEventPluginAdminUserSecret
+
+  DeadlineRCSServerProfileArn:
+    Description: Instance Profile ARN for Deadline RCS Servers
+    Value: !GetAtt DeadlineRCSServerProfile.Arn

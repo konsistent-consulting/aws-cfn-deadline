@@ -176,6 +176,7 @@ Resources:
         sgDeadlineWorkers: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineWorkers
         KeyName: !Ref KeyName
         RCSServerInstanceType: !Ref RCSServerInstanceType
+        DeadlineRCSServerProfileArn: !GetAtt IAMRolesStack.Outputs.DeadlineRCSServerProfileArn
 
 Outputs:
   VPCId:
@@ -220,3 +221,9 @@ Outputs:
     Value: !GetAtt EFSFileSystemStack.Outputs.EFSMountDNS
     Export:
       Name: !Sub "EFSMountDNS"
+
+  DeadlineRCSServerProfileArn:
+    Description: "Instance Profile ARN for Deadline RCS Servers"
+    Value: !GetAtt IAMRolesStack.Outputs.DeadlineRCSServerProfileArn
+    Export:
+      Name: !Sub "DeadlineRCSServerProfileArn"
