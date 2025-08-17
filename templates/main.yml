@@ -113,14 +113,14 @@ Resources:
   SecurityGroupsStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
-      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/ec2-security-groups.yml'
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/templates/ec2-security-groups.yml'
       Parameters:
         VPCId: !Ref VPCId
 
   IAMRolesStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
-      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/iam.yml'
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/templates/iam.yml'
       Parameters:
         TopStackName: !Ref TopStackName
 
@@ -128,7 +128,7 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: SecurityGroupsStack
     Properties:
-      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/efs-filesystem.yml'
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/templates/efs-filesystem.yml'
       Parameters:
         PrivateStgSubnet1a: !Ref PrivateStgSubnet1a
         PrivateStgSubnet1b: !Ref PrivateStgSubnet1b
@@ -140,7 +140,7 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: SecurityGroupsStack
     Properties:
-      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/documentdb-deadlinedb.yml'
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/templates/documentdb-deadlinedb.yml'
       Parameters:
         VPCId: !Ref VPCId
         PrivateSvcsSubnet1a: !Ref PrivateSvcsSubnet1a
@@ -154,7 +154,7 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: SecurityGroupsStack
     Properties:
-      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/private-loadbalancer.yml'
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/templates/private-loadbalancer.yml'
       Parameters:
         VPCId: !Ref VPCId
         PrivateSvcsSubnet1a: !Ref PrivateSvcsSubnet1a
@@ -167,7 +167,7 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: SecurityGroupsStack
     Properties:
-      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/rcs-server-launch-template.yml'
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/templates/rcs-server-launch-template.yml'
       Parameters:
         VPCId: !Ref VPCId
         PrivateSvcsSubnet1a: !Ref PrivateSvcsSubnet1a
