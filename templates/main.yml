@@ -5,9 +5,10 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
         - Label:
-            default: VPC Information
+            default: General Information
           Parameters:
           - VPCId
+          - TopStackName
 
         - Label:
             default: Storage Network Subnets
@@ -28,12 +29,12 @@ Metadata:
           Parameters:
           - DocumentDBUsername
           - DocumentDBPassword
-
+          
         - Label:
             default: Deadline RCS Servers Configuration
           Parameters:
           - KeyName
-          - DocumentDBPassword
+          - RCSServerInstanceType
 
 Parameters:
   VPCId:
@@ -149,6 +150,7 @@ Resources:
         sgDeadlineDocumentDBCluster: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineDocumentDBCluster
         DocumentDBUsername: !Ref DocumentDBUsername
         DocumentDBPassword: !Ref DocumentDBPassword
+        TopStackName: !Ref TopStackName
 
   PrivateLoadBalancerStack:
     Type: 'AWS::CloudFormation::Stack'
@@ -227,3 +229,9 @@ Outputs:
     Value: !GetAtt IAMRolesStack.Outputs.DeadlineRCSServerProfileArn
     Export:
       Name: !Sub "DeadlineRCSServerProfileArn"
+
+  DocumentDBSecretArn:
+    Description: "Secret ARN for DocumentDB credentials"
+    Value: !GetAtt DocumentDBStack.Outputs.DocumentDBSecretArn
+    Export:
+      Name: !Sub "DocumentDBSecretArn"

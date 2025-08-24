@@ -22,6 +22,10 @@ Parameters:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Security Group for the Deadline DocumentDB Cluster
 
+  TopStackName:
+    Type: String
+    Description: Used for namespacing Secrets and Parameters (e.g. "studio01")
+
   DocumentDBUsername:
     Description: "Enter the DocumentDB Username"
     Type: String
@@ -72,6 +76,17 @@ Resources:
       DBClusterIdentifier: !Ref DocumentDBCluster
       DBInstanceIdentifier: deadline10-docdb-cluster-instance-001
 
+  DocumentDBSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/documentdb/credentials"
+      Description: Deadline DocumentDB master user credentials
+      SecretString: !Sub |
+        {
+          "username": "${DocumentDBUsername}",
+          "password": "${DocumentDBPassword}"
+        }
+
 Outputs:
   SubnetGroupName:
     Description: The name of the created subnet group.
@@ -80,3 +95,7 @@ Outputs:
   ClusterEndpoint:
     Description: The endpoint of the created DocumentDB cluster.
     Value: !GetAtt DocumentDBCluster.Endpoint
+
+  DocumentDBSecretArn:
+    Description: ARN of the Secrets Manager secret storing DocumentDB credentials
+    Value: !Ref DocumentDBSecret
