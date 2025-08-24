@@ -175,10 +175,17 @@ Resources:
         PrivateSvcsSubnet1a: !Ref PrivateSvcsSubnet1a
         PrivateSvcsSubnet1b: !Ref PrivateSvcsSubnet1b
         PrivateSvcsSubnet1c: !Ref PrivateSvcsSubnet1c
-        sgDeadlineWorkers: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineWorkers
+        sgDeadlineRCS: !GetAtt SecurityGroupsStack.Outputs.sgDeadlineRCS
         KeyName: !Ref KeyName
         RCSServerInstanceType: !Ref RCSServerInstanceType
         DeadlineRCSServerProfileArn: !GetAtt IAMRolesStack.Outputs.DeadlineRCSServerProfileArn
+
+  Deadline10InstallerParamsStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://danm-dev-cf-eu-west-2.s3.eu-west-1.amazonaws.com/aws-cfn-deadline/templates/deadline10-installers-parameters.yml'
+      Parameters:
+        TopStackName: !Ref TopStackName
 
 Outputs:
   VPCId:
