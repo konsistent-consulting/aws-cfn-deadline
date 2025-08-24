@@ -23,7 +23,7 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
     Description: Subnet ID for Availability Zone 1c
 
-  sgDeadlineWorkers:
+  sgDeadlineRCS:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Security Group for Deadline RCS servers
 
@@ -62,7 +62,7 @@ Resources:
             AssociatePublicIpAddress: false
             SubnetId: !Ref PrivateSvcsSubnet1a
             Groups:
-              - !Ref sgDeadlineWorkers
+              - !Ref sgDeadlineRCS
         MetadataOptions:
           HttpTokens: required
           HttpEndpoint: enabled           
