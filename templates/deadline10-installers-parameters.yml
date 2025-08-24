@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Stores Deadline 10.4.2.2 installer URLs (Linux, MacOS, Windows) in SSM Parameter Store
+  so they can be retrieved in bootstrap scripts.
+
+Parameters:
+  TopStackName:
+    Type: String
+    Description: Name of the top-level stack (used in SSM parameter paths)
+
+Resources:
+  DeadlineLinuxInstallerParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/linux-installer-url"
+      Type: String
+      Value: "https://thinkbox-installers.s3.us-west-2.amazonaws.com/Releases/Deadline/10.4/8_10.4.2.2/Deadline-10.4.2.2-linux-installers.tar"
+      Description: "S3 URL for Deadline 10.4.2.2 Linux installer"
+
+  DeadlineMacOSInstallerParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/macos-installer-url"
+      Type: String
+      Value: "https://thinkbox-installers.s3.us-west-2.amazonaws.com/Releases/Deadline/10.4/8_10.4.2.2/Deadline-10.4.2.2-osx-installers.dmg"
+      Description: "S3 URL for Deadline 10.4.2.2 MacOS installer"
+
+  DeadlineWindowsInstallerParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/windows-installer-url"
+      Type: String
+      Value: "https://thinkbox-installers.s3.us-west-2.amazonaws.com/Releases/Deadline/10.4/8_10.4.2.2/Deadline-10.4.2.2-windows-installers.zip"
+      Description: "S3 URL for Deadline 10.4.2.2 Windows installer"
+
+Outputs:
+  DeadlineLinuxInstallerParameter:
+    Description: SSM parameter name for Linux installer URL
+    Value: !Ref DeadlineLinuxInstallerParameter
+
+  DeadlineMacOSInstallerParameter:
+    Description: SSM parameter name for MacOS installer URL
+    Value: !Ref DeadlineMacOSInstallerParameter
+
+  DeadlineWindowsInstallerParameter:
+    Description: SSM parameter name for Windows installer URL
+    Value: !Ref DeadlineWindowsInstallerParameter
