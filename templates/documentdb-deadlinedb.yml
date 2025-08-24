@@ -87,6 +87,14 @@ Resources:
           "password": "${DocumentDBPassword}"
         }
 
+  DocumentDBGlobalCertParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/documentdb/global-ca-bundle"
+      Type: String
+      Value: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
+      Description: "Amazon RDS/DocumentDB global truststore certificate bundle URL"
+
 Outputs:
   SubnetGroupName:
     Description: The name of the created subnet group.
@@ -99,3 +107,7 @@ Outputs:
   DocumentDBSecretArn:
     Description: ARN of the Secrets Manager secret storing DocumentDB credentials
     Value: !Ref DocumentDBSecret
+
+  DocumentDBGlobalCertParameter:
+    Description: SSM parameter name for DocumentDB global cert
+    Value: !Ref DocumentDBGlobalCertParameter
