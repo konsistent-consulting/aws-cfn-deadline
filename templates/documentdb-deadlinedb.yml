@@ -95,6 +95,14 @@ Resources:
       Value: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
       Description: "Amazon RDS/DocumentDB global truststore certificate bundle URL"
 
+  DocumentDBEndpointParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/managed-studio/${TopStackName}/deadline10/documentdb/endpoint"
+      Type: String
+      Value: !GetAtt DocumentDBCluster.Endpoint
+      Description: "DocumentDB cluster endpoint for Deadline"
+
 Outputs:
   SubnetGroupName:
     Description: The name of the created subnet group.
