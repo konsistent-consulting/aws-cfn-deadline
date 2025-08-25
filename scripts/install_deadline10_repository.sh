@@ -67,6 +67,8 @@ run_updates() {
 
     info "⬆️ Running system updates..."
     sudo dnf update -y
+    sudo dnf install -y dnf-plugins-core
+    sudo /usr/bin/crb enable
 
     info "📦 Installing additional utilities (bzip2, wget, epel-release, efs-utils, unzip)..."
     sudo dnf install -y bzip2 wget epel-release efs-utils unzip
