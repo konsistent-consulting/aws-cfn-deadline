@@ -69,7 +69,9 @@ run_updates() {
     sudo dnf update -y
 
     info "📦 Installing additional utilities (bzip2, wget, epel-release, efs-utils, unzip)..."
-    sudo dnf install -y bzip2 wget epel-release efs-utils unzip btop
+    sudo dnf install -y bzip2 wget epel-release efs-utils unzip
+    # Install btop from EPEL
+    sudo dnf install -y btop
     info "✅ System updates and package installation complete."
 }
 
