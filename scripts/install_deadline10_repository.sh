@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# To Do:
+# Move the TopStack Parameter to SSM and fetch it here
+# Add error handling and logging
+
 set -euo pipefail
 
 # ===== Global Logging Setup =====
@@ -68,7 +73,7 @@ run_updates() {
     info "⬆️ Running system updates..."
     sudo dnf update -y
     sudo dnf install -y dnf-plugins-core
-    sudo /usr/bin/crb enable
+    sudo dnf config-manager --set-enabled crb
 
     info "📦 Installing additional utilities (bzip2, wget, epel-release, efs-utils, unzip)..."
     sudo dnf install -y bzip2 wget epel-release efs-utils unzip
@@ -209,11 +214,11 @@ configure_documentdb_cert() {
     local docdb_ca_file="$cert_dir/global-bundle.pem"
     local ssm_param="/managed-studio/studio-ldn-deadline/deadline10/documentdb/global-ca-bundle"
 
-    log "🔍 Checking DocumentDB CA bundle at $docdb_ca_file"
+    info "🔍 Checking DocumentDB CA bundle at $docdb_ca_file"
 
     # If cert already exists, we're done
     if [[ -f "$docdb_ca_file" ]]; then
-        log "✅ CA bundle already exists at $docdb_ca_file"
+        info "✅ CA bundle already exists at $docdb_ca_file"
         return 0
     fi
 
@@ -234,9 +239,9 @@ configure_documentdb_cert() {
 
     if [[ -s "$docdb_ca_file" ]]; then
         chmod 644 "$docdb_ca_file"
-        log "✅ CA bundle downloaded successfully: $docdb_ca_file"
+        info "✅ CA bundle downloaded successfully: $docdb_ca_file"
     else
-        log "❌ Failed to download CA bundle from $url"
+        error "❌ Failed to download CA bundle from $url"
         return 1
     fi
 }
@@ -253,8 +258,8 @@ install_deadline_repository() {
 
         if [[ -n "$installed_version" ]]; then
             info "✅ Deadline Repository already installed."
-            info "   📂 Location: $repo_dir"
-            info "   🔢 Version: $installed_version"
+            info "📂 Location: $repo_dir"
+            info "🔢 Version: $installed_version"
         else
             info "✅ Deadline Repository already installed, but version could not be detected."
         fi
